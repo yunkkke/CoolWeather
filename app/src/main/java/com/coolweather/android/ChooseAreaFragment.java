@@ -1,6 +1,7 @@
 package com.coolweather.android;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,6 +74,8 @@ public class ChooseAreaFragment extends Fragment {
         listView.setAdapter(adapter);
         return view;
     }
+
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -86,6 +89,12 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", weatherId);    // 向intent传入WeatherId
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -101,6 +110,8 @@ public class ChooseAreaFragment extends Fragment {
         });
         queryProvinces(); // 加载省级数据
     }
+
+
     /**
      * 查询全国所有的省，优先从数据库中查，如果没有查询到再到服务器上查
      */
@@ -171,7 +182,8 @@ public class ChooseAreaFragment extends Fragment {
      */
     private void queryFromServer(String address, final String type) {
         showProgressDialog();
-        HttpUtil.sendOkHttpRequest(address, new Callback() { // 向服务器发送请求
+
+       HttpUtil.sendOkHttpRequest(address, new Callback() { // 向服务器发送请求
             @Override
             public void onFailure(Call call, IOException e) { //处理加载失败的情况
                 getActivity().runOnUiThread(new Runnable() {
@@ -212,6 +224,8 @@ public class ChooseAreaFragment extends Fragment {
             }
         });
     }
+
+
     /**
      * 显示进度对话框
      */
